@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .profile-layout { display:grid; grid-template-columns:280px 1fr; gap:32px; max-width:1100px; margin:0 auto; padding:40px 32px; }
+    .profile-sidebar { display:flex; flex-direction:column; gap:20px; }
+    .profile-avatar-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:28px 20px; text-align:center; box-shadow:var(--shadow-sm); }
+    .avatar-circle {
+      width:100px; height:100px; border-radius:50%;
+      background:linear-gradient(135deg,var(--sb-purple-light),var(--sb-purple-base));
+      display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-display); font-size:2.4rem; color:var(--sb-white);
+      margin:0 auto 16px; font-weight:700; box-shadow:var(--shadow-md);
+      position:relative; overflow:hidden;
+    }
+    .avatar-img { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:50%; }
+    .profile-name { font-family:var(--font-display); font-size:1.2rem; color:var(--sb-text-dark); margin:0 0 4px; }
+    .profile-email { color:var(--sb-text-light); font-size:.85rem; margin:0 0 18px; }
+    .avatar-upload-btn { display:inline-flex; align-items:center; gap:6px; background:var(--sb-surface); border:1px solid var(--sb-border); color:var(--sb-text-mid); font-size:.82rem; font-weight:600; padding:7px 14px; border-radius:var(--r-md); cursor:pointer; transition:all var(--t-fast); }
+    .avatar-upload-btn:hover { background:var(--sb-purple-pale); border-color:var(--sb-purple-base); color:var(--sb-purple-base); }
+    #avatarUrlInput { display:none; margin-top:12px; }
+    .sidebar-stats { background:linear-gradient(135deg,var(--sb-purple-dark),var(--sb-purple-mid)); border-radius:var(--r-lg); padding:20px; }
+    .sidebar-stat { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+    .sidebar-stat:last-child { border-bottom:none; }
+    .sidebar-stat-label { color:rgba(255,255,255,.6); font-size:.82rem; }
+    .sidebar-stat-val   { color:var(--sb-gold); font-weight:700; font-size:.9rem; }
+
+    .profile-main { display:flex; flex-direction:column; gap:24px; }
+    .profile-section { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
+    .profile-section-header { background:linear-gradient(135deg,var(--sb-purple-dark),var(--sb-purple-mid)); padding:18px 24px; display:flex; align-items:center; gap:10px; }
+    .profile-section-header h2 { font-family:var(--font-display); font-size:1.1rem; color:var(--sb-white); margin:0; }
+    .profile-section-header span { color:var(--sb-gold); font-size:1.2rem; }
+    .profile-field { display:grid; grid-template-columns:160px 1fr auto; align-items:center; padding:16px 24px; border-bottom:1px solid var(--sb-border); gap:16px; }
+    .profile-field:last-child { border-bottom:none; }
+    .field-label { font-size:.85rem; font-weight:600; color:var(--sb-text-mid); }
+    .field-value { font-size:.9rem; color:var(--sb-text-dark); min-height:22px; }
+    .field-value:empty::before { content:'Not set'; color:var(--sb-text-light); font-style:italic; }
+    .field-edit-btn { padding:6px 14px; border-radius:var(--r-sm); border:1px solid var(--sb-purple-pale); background:none; color:var(--sb-purple-base); font-size:.8rem; font-weight:600; cursor:pointer; transition:all var(--t-fast); white-space:nowrap; }
+    .field-edit-btn:hover { background:var(--sb-purple-pale); }
+    @media(max-width:768px) { .profile-layout{grid-template-columns:1fr;} .profile-field{grid-template-columns:1fr;gap:6px;} }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="user-page.html" class="brand">
+      <div class="brand-icon">S</div>
+      <span class="brand-name">Skill<span>Builders</span></span>
+    </a>
+    <div class="sb-search">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search courses…" id="globalSearch" autocomplete="off">
+    </div>
+    <nav class="sb-nav">
+      <a href="user-enrolled-courses.html" class="hide-mobile">My Courses</a>
+      <a href="user-cart-courses.html" class="icon-btn" title="Cart"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></a>
+      <a href="user-favourite-courses.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></a>
+      <a href="user-page.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </nav>
+  </header>
+
+  <div class="sb-page-hero sb-animate">
+    <h1>My <span>Profile</span></h1>
+    <p>Manage your personal information and account settings.</p>
+  </div>
+
+  <div class="profile-layout">
+    <aside class="profile-sidebar sb-animate sb-animate-d1">
+      <div class="profile-avatar-card">
+        <div class="avatar-circle" id="avatarCircle">
+          <span id="avatarInitial">?</span>
+          <img id="profileImg" class="avatar-img" src="" alt="" style="display:none" onerror="this.style.display='none'">
+        </div>
+        <div class="profile-name" id="displayName">Loading…</div>
+        <div class="profile-email" id="displayEmail"></div>
+        <button class="avatar-upload-btn" onclick="toggleAvatarInput()">📷 Change photo</button>
+        <input class="sb-input" id="avatarUrlInput" type="text" placeholder="Paste image URL…">
+        <div id="avatarSaveRow" style="display:none;margin-top:8px">
+          <button class="sb-btn sb-btn-primary" style="width:100%;padding:9px;font-size:.85rem" onclick="saveAvatar()">Save photo</button>
+        </div>
+      </div>
+      <div class="sidebar-stats">
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Enrolled</span><span class="sidebar-stat-val" id="stat-enrolled">—</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Completed</span><span class="sidebar-stat-val" id="stat-completed">—</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Favourites</span><span class="sidebar-stat-val" id="stat-fav">—</span></div>
+        <div class="sidebar-stat"><span class="sidebar-stat-label">Stream</span><span class="sidebar-stat-val" id="stat-stream">—</span></div>
+      </div>
+    </aside>
+
+    <div class="profile-main sb-animate sb-animate-d2">
+      <div class="profile-section">
+        <div class="profile-section-header"><span>👤</span><h2>Personal Information</h2></div>
+        <div class="profile-field"><div class="field-label">Full Name</div><div class="field-value" id="name"></div><button class="field-edit-btn" id="editname">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Gender</div><div class="field-value" id="gender"></div><button class="field-edit-btn" id="editgender">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Date of Birth</div><div class="field-value" id="dob"></div><button class="field-edit-btn" id="editdob">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Phone Number</div><div class="field-value" id="phoneNumber"></div><button class="field-edit-btn" id="editphoneNumber">Edit</button></div>
+      </div>
+      <div class="profile-section">
+        <div class="profile-section-header"><span>📍</span><h2>Location &amp; Academic</h2></div>
+        <div class="profile-field"><div class="field-label">Country</div><div class="field-value" id="country"></div><button class="field-edit-btn" id="editcountry">Edit</button></div>
+        <div class="profile-field"><div class="field-label">City</div><div class="field-value" id="city"></div><button class="field-edit-btn" id="editcity">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Grade / Year</div><div class="field-value" id="grade"></div><button class="field-edit-btn" id="editgrade">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Current Stream</div><div class="field-value" id="stream"></div><button class="field-edit-btn" id="editstream">Edit</button></div>
+        <div class="profile-field"><div class="field-label">Interested Streams</div><div class="field-value" id="interestedStreams"></div><button class="field-edit-btn" id="editinterestedStreams">Edit</button></div>
+      </div>
+      <div class="profile-section">
+        <div class="profile-section-header"><span>📝</span><h2>Bio &amp; Summary</h2></div>
+        <div class="profile-field" style="grid-template-columns:160px 1fr auto;align-items:flex-start"><div class="field-label" style="padding-top:2px">Summary</div><div class="field-value" id="professionalSummary"></div><button class="field-edit-btn" id="editprofessionalSummary">Edit</button></div>
+      </div>
+      <div class="profile-section">
+        <div class="profile-section-header"><span>🔐</span><h2>Security</h2></div>
+        <div class="profile-field"><div class="field-label">Password</div><div class="field-value">••••••••</div><a href="user-login.html" class="field-edit-btn">Reset</a></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sb-footer">
+    <div class="sb-footer-inner">
+      <div><div class="brand-name">Skill<span>Builders</span></div></div>
+    </div>
+    <div class="sb-footer-copy">Copyright &copy; 2024 SkillBuilders. All rights reserved.</div>
+  </footer>
+
+  <script src="sb-global.js"></script>
+  <script src="user-profile.js"></script>
+  <script>
+    function toggleAvatarInput() {
+      const inp = document.getElementById('avatarUrlInput');
+      const row = document.getElementById('avatarSaveRow');
+      const show = inp.style.display === 'none' || !inp.style.display;
+      inp.style.display = show ? 'block' : 'none';
+      row.style.display  = show ? 'block' : 'none';
+    }
+    function saveAvatar() {
+      const url = document.getElementById('avatarUrlInput').value.trim();
+      if (!url) return sbToast('Please enter an image URL', 'error');
+      const img = document.getElementById('profileImg');
+      img.src = url;
+      img.style.display = 'block';
+      document.getElementById('avatarInitial').style.display = 'none';
+      sbToast('Profile photo updated!', 'success');
+    }
+    document.getElementById('globalSearch').addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&e.target.value.trim()){sessionStorage.setItem('searchQuery',e.target.value.trim());window.location.href='search-courses.html';}
+    });
+    // After profile loads, update sidebar
+    const origFill = window.fillProfileData;
+    window.addEventListener('profileDataLoaded', e => {
+      const d = e.detail;
+      if (d) {
+        document.getElementById('displayName').textContent = d.name || '—';
+        document.getElementById('displayEmail').textContent = d.email || '';
+        document.getElementById('avatarInitial').textContent = (d.name||'?')[0].toUpperCase();
+        document.getElementById('stat-enrolled').textContent = (d.enrolledCourses||[]).length;
+        document.getElementById('stat-completed').textContent = (d.certificates||[]).length;
+        document.getElementById('stat-fav').textContent = (d.favouriteCourses||[]).length;
+        document.getElementById('stat-stream').textContent = d.stream || '—';
+      }
+    });
+  </script>
+</body>
+</html>

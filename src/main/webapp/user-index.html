@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Feed — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .feed-layout { display:grid; grid-template-columns:1fr 300px; gap:32px; max-width:1100px; margin:0 auto; padding:36px 32px; }
+    .feed-header { background:linear-gradient(135deg,var(--sb-purple-dark),var(--sb-purple-mid)); padding:32px 40px; border-bottom:2px solid var(--sb-gold); }
+    .feed-header h1 { font-family:var(--font-display); color:var(--sb-white); font-size:1.8rem; margin:0 0 4px; }
+    .feed-header h1 span { color:var(--sb-gold); }
+    .feed-header p { color:rgba(255,255,255,.55); margin:0; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .section-head h2 { font-family:var(--font-display); font-size:1.2rem; color:var(--sb-text-dark); margin:0; }
+    .section-head a { font-size:.85rem; color:var(--sb-purple-base); font-weight:600; }
+    .courses-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:18px; }
+    .course-mini-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); transition:all var(--t-mid); cursor:pointer; }
+    .course-mini-card:hover { box-shadow:var(--shadow-md); transform:translateY(-3px); }
+    .mini-thumb { height:120px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .mini-body { padding:14px; }
+    .mini-title { font-family:var(--font-display); font-size:.9rem; margin:0 0 6px; color:var(--sb-text-dark); }
+    .mini-meta  { color:var(--sb-text-light); font-size:.78rem; }
+    .progress-bar-wrap { height:4px; background:var(--sb-border); border-radius:var(--r-pill); margin-top:8px; overflow:hidden; }
+    .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--sb-purple-light),var(--sb-purple-base)); border-radius:var(--r-pill); }
+    .sidebar-widget { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-sm); margin-bottom:20px; }
+    .sidebar-widget h3 { font-family:var(--font-display); font-size:1rem; color:var(--sb-text-dark); margin:0 0 14px; }
+    .streak-display { text-align:center; padding:12px 0; }
+    .streak-num { font-family:var(--font-display); font-size:2.8rem; color:var(--sb-gold); font-weight:800; }
+    .streak-label { color:var(--sb-text-light); font-size:.82rem; }
+    @media(max-width:900px) { .feed-layout{grid-template-columns:1fr;} .feed-header{padding:24px 20px;} }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="user-index.html" class="brand"><div class="brand-icon">S</div><span class="brand-name">Skill<span>Builders</span></span></a>
+    <div class="sb-search"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" placeholder="Search courses…" id="globalSearch" autocomplete="off"></div>
+    <nav class="sb-nav">
+      <a href="user-enrolled-courses.html" class="hide-mobile">My Courses</a>
+      <a href="instructor-login.html" class="hide-mobile">Teach</a>
+      <a href="user-cart-courses.html" class="icon-btn" title="Cart"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></a>
+      <a href="user-favourite-courses.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></a>
+      <a href="user-page.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </nav>
+  </header>
+
+  <div class="feed-header sb-animate">
+    <h1>Welcome back, <span id="feedUserName">Learner</span> 👋</h1>
+    <p id="feedSubtitle">Continue your journey — your next lesson is ready.</p>
+  </div>
+
+  <div class="feed-layout">
+    <div>
+      <div style="margin-bottom:36px" class="sb-animate sb-animate-d1">
+        <div class="section-head"><h2>Continue Learning</h2><a href="user-enrolled-courses.html">View all →</a></div>
+        <div class="courses-row" id="enrolledRow">
+          <div class="course-mini-card"><div class="sb-skeleton" style="height:120px"></div><div class="mini-body"><div class="sb-skeleton" style="height:16px;margin-bottom:6px"></div><div class="sb-skeleton" style="height:12px;width:50%"></div></div></div>
+          <div class="course-mini-card"><div class="sb-skeleton" style="height:120px"></div><div class="mini-body"><div class="sb-skeleton" style="height:16px;margin-bottom:6px"></div><div class="sb-skeleton" style="height:12px;width:50%"></div></div></div>
+        </div>
+      </div>
+      <div class="sb-animate sb-animate-d2">
+        <div class="section-head"><h2>Explore New Courses</h2><a href="search-courses.html">Browse all →</a></div>
+        <div class="courses-row" id="exploreRow">
+          <div class="course-mini-card"><div class="sb-skeleton" style="height:120px"></div><div class="mini-body"><div class="sb-skeleton" style="height:16px;margin-bottom:6px"></div><div class="sb-skeleton" style="height:12px;width:50%"></div></div></div>
+          <div class="course-mini-card"><div class="sb-skeleton" style="height:120px"></div><div class="mini-body"><div class="sb-skeleton" style="height:16px;margin-bottom:6px"></div><div class="sb-skeleton" style="height:12px;width:50%"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sb-animate sb-animate-d3">
+      <div class="sidebar-widget">
+        <h3>🔥 Learning Streak</h3>
+        <div class="streak-display"><div class="streak-num" id="streakCount">1</div><div class="streak-label">days in a row</div></div>
+      </div>
+      <div class="sidebar-widget">
+        <h3>Quick Links</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="user-page.html" style="display:flex;align-items:center;gap:8px;color:var(--sb-text-mid);font-size:.88rem;padding:8px;border-radius:var(--r-sm);transition:all var(--t-fast)" onmouseover="this.style.background='var(--sb-surface)'" onmouseout="this.style.background=''">🏆 Certificates</a>
+          <a href="retrieve-transactions.html" style="display:flex;align-items:center;gap:8px;color:var(--sb-text-mid);font-size:.88rem;padding:8px;border-radius:var(--r-sm);transition:all var(--t-fast)" onmouseover="this.style.background='var(--sb-surface)'" onmouseout="this.style.background=''">💳 Transactions</a>
+          <a href="user-favourite-courses.html" style="display:flex;align-items:center;gap:8px;color:var(--sb-text-mid);font-size:.88rem;padding:8px;border-radius:var(--r-sm);transition:all var(--t-fast)" onmouseover="this.style.background='var(--sb-surface)'" onmouseout="this.style.background=''">❤️ Favourites</a>
+          <a href="instructor-login.html" style="display:flex;align-items:center;gap:8px;color:var(--sb-text-mid);font-size:.88rem;padding:8px;border-radius:var(--r-sm);transition:all var(--t-fast)" onmouseover="this.style.background='var(--sb-surface)'" onmouseout="this.style.background=''">🎓 Become Instructor</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="sb-footer">
+    <div class="sb-footer-inner"><div><div class="brand-name">Skill<span>Builders</span></div></div></div>
+    <div class="sb-footer-copy">Copyright &copy; 2024 SkillBuilders. All rights reserved.</div>
+  </footer>
+
+  <script src="sb-global.js"></script>
+  <script src="user-index.js"></script>
+  <script>
+    const gradients=[{cls:'sb-gc-purple',icon:'💻'},{cls:'sb-gc-indigo',icon:'🗄️'},{cls:'sb-gc-teal',icon:'📊'},{cls:'sb-gc-violet',icon:'🤖'},{cls:'sb-gc-rose',icon:'🔐'},{cls:'sb-gc-amber',icon:'☁️'}];
+    document.getElementById('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){sessionStorage.setItem('searchQuery',e.target.value.trim());window.location.href='search-courses.html';}});
+
+    // Streak (stored in sessionStorage as demo; extend with backend as needed)
+    const streak = parseInt(localStorage.getItem('sb_streak') || '1');
+    document.getElementById('streakCount').textContent = streak;
+
+    window.addEventListener('userFeedLoaded', e => {
+      const d = e.detail;
+      if (!d) return;
+      if (d.name) { document.getElementById('feedUserName').textContent = d.name.split(' ')[0]; }
+      // Enrolled courses row
+      const row = document.getElementById('enrolledRow');
+      row.innerHTML = '';
+      const enrolled = d.enrolledCourses || [];
+      if (enrolled.length === 0) {
+        row.innerHTML = '<p style="color:var(--sb-text-light)">No courses yet. <a href="search-courses.html" style="color:var(--sb-purple-base)">Browse courses →</a></p>';
+      } else {
+        enrolled.slice(0,4).forEach((c,i) => {
+          const g = gradients[i%gradients.length];
+          const el = document.createElement('div'); el.className='course-mini-card';
+          el.onclick=()=>{ sessionStorage.setItem('currentCourseId',c.courseid); window.location.href='course-modules.html'; };
+          el.innerHTML=`<div class="mini-thumb sb-gradient-card ${g.cls}" style="border-radius:0;min-height:120px"><div style="font-size:2.5rem;position:relative;z-index:1">${g.icon}</div></div><div class="mini-body"><div class="mini-title">Course #${c.courseid}</div><div class="mini-meta">Progress: ${c.progress||0}%</div><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${c.progress||0}%"></div></div></div>`;
+          row.appendChild(el);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: skillbuilders-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: skillbuilders
+      MYSQL_USER: skillbuilder
+      MYSQL_PASSWORD: "skillbuilders2024"
+      MYSQL_ROOT_PASSWORD: "root_skillbuilders2024"
+    volumes:
+      - db-data:/var/lib/mysql
+      # FIXED: both SQL files mounted — init.sql runs first, then enhanced additions
+      - ./sql/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./sql/02-enhanced-schema.sql:/docker-entrypoint-initdb.d/02-enhanced-schema.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uskillbuilder", "-pskillbuilders2024"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: skillbuilders-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: skillbuilders
+      DB_USER: skillbuilder
+      DB_PASSWORD: "skillbuilders2024"
+
+volumes:
+  db-data:

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .about-hero { background:linear-gradient(135deg,var(--sb-purple-darkest) 0%,var(--sb-purple-dark) 60%,var(--sb-purple-mid) 100%); padding:80px 48px; text-align:center; position:relative; overflow:hidden; }
+    .about-hero::after { content:''; position:absolute; bottom:-80px; left:50%; transform:translateX(-50%); width:500px; height:300px; background:radial-gradient(ellipse,rgba(240,180,41,.18) 0%,transparent 70%); pointer-events:none; }
+    .about-hero h1 { font-family:var(--font-display); font-size:clamp(2rem,5vw,3.5rem); color:var(--sb-white); margin:0 0 16px; position:relative; z-index:1; }
+    .about-hero h1 span { color:var(--sb-gold); }
+    .about-hero p { color:rgba(255,255,255,.6); font-size:1.1rem; max-width:600px; margin:0 auto; position:relative; z-index:1; }
+    .about-content { max-width:900px; margin:0 auto; padding:64px 32px; }
+    .about-mission { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; margin-bottom:64px; }
+    .about-mission-visual { height:280px; border-radius:var(--r-lg); }
+    .about-mission h2 { font-family:var(--font-display); font-size:2rem; color:var(--sb-text-dark); margin:0 0 16px; }
+    .about-mission h2 span { color:var(--sb-purple-base); }
+    .about-mission p { color:var(--sb-text-mid); line-height:1.75; }
+    .values-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-top:48px; }
+    .value-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:28px 20px; text-align:center; box-shadow:var(--shadow-sm); }
+    .value-icon { font-size:2rem; margin-bottom:12px; }
+    .value-card h3 { font-family:var(--font-display); font-size:1rem; margin:0 0 8px; color:var(--sb-text-dark); }
+    .value-card p { color:var(--sb-text-light); font-size:.85rem; margin:0; }
+    .contact-section { background:linear-gradient(135deg,var(--sb-purple-base) 0%,var(--sb-purple-mid) 100%); border-radius:var(--r-lg); padding:40px; text-align:center; margin-top:48px; }
+    .contact-section h2 { font-family:var(--font-display); color:var(--sb-white); font-size:1.7rem; margin:0 0 10px; }
+    .contact-section p { color:rgba(255,255,255,.65); margin:0 0 24px; }
+    .contact-items { display:flex; justify-content:center; gap:32px; flex-wrap:wrap; }
+    .contact-item { display:flex; align-items:center; gap:10px; color:var(--sb-gold-light); font-size:.9rem; }
+    @media(max-width:700px) { .about-mission{grid-template-columns:1fr;} .about-hero,.about-content{padding:48px 20px;} }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="index.html" class="brand"><div class="brand-icon">S</div><span class="brand-name">Skill<span>Builders</span></span></a>
+    <div class="sb-search"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" placeholder="Search courses…" id="globalSearch" autocomplete="off"></div>
+    <nav class="sb-nav">
+      <a href="user-login.html" class="hide-mobile">My Courses</a>
+      <a href="instructor-login.html" class="hide-mobile">Teach</a>
+      <a href="about-us.html" style="color:var(--sb-gold)">About</a>
+      <a href="user-login.html" class="sb-btn btn-login hide-mobile">Log in</a>
+      <a href="user-signup.html" class="sb-btn btn-signup">Sign up</a>
+    </nav>
+  </header>
+
+  <div class="about-hero sb-animate">
+    <h1>About <span>SkillBuilders</span></h1>
+    <p>We believe quality education should be accessible to everyone, everywhere.</p>
+  </div>
+
+  <div class="about-content">
+    <div class="about-mission sb-animate sb-animate-d1">
+      <div class="about-mission-visual sb-gradient-card sb-gc-purple">
+        <div class="sb-gc-icon">🎓</div>
+        <div class="sb-gc-label">Learn · Grow · Succeed</div>
+      </div>
+      <div>
+        <h2>Our <span>Mission</span></h2>
+        <p>SkillBuilders was built by students, for students. We saw a gap between academic theory and real-world skill — and we built a platform to close it.</p>
+        <p style="margin-top:14px">From beginner-friendly fundamentals to advanced professional tracks, our courses are designed to deliver measurable outcomes through structured learning, interactive quizzes, and verified certificates.</p>
+      </div>
+    </div>
+
+    <h2 class="sb-section-title sb-animate" style="text-align:center">What We <span>Stand For</span></h2>
+    <div class="values-grid sb-animate sb-animate-d1">
+      <div class="value-card"><div class="value-icon">🎯</div><h3>Relevance</h3><p>Courses built around real industry needs, updated regularly.</p></div>
+      <div class="value-card"><div class="value-icon">🤝</div><h3>Accessibility</h3><p>Free and affordable courses for every level and background.</p></div>
+      <div class="value-card"><div class="value-icon">🏆</div><h3>Excellence</h3><p>Rigorous quality checks for every instructor and course.</p></div>
+      <div class="value-card"><div class="value-icon">🚀</div><h3>Growth</h3><p>Continuous improvement for our platform and our learners.</p></div>
+    </div>
+
+    <div class="contact-section sb-animate sb-animate-d2">
+      <h2>Get in Touch</h2>
+      <p>Questions, partnerships, or feedback — we'd love to hear from you.</p>
+      <div class="contact-items">
+        <div class="contact-item">📧 skillbuilders@gmail.com</div>
+        <div class="contact-item">📞 6587135646</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sb-footer">
+    <div class="sb-footer-inner"><div><div class="brand-name">Skill<span>Builders</span></div><p>Empowering learners worldwide.</p></div></div>
+    <div class="sb-footer-copy">Copyright &copy; 2024 SkillBuilders. All rights reserved.</div>
+  </footer>
+  <script src="sb-global.js"></script>
+</body>
+</html>

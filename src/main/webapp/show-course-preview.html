@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Preview — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .course-hero {
+      background: linear-gradient(135deg, var(--sb-purple-darkest) 0%, var(--sb-purple-dark) 60%, var(--sb-purple-mid) 100%);
+      padding: 48px 48px 0;
+      position: relative; overflow: hidden;
+    }
+    .course-hero::after { content:''; position:absolute; top:-80px; right:-80px; width:380px; height:380px; background:radial-gradient(circle,rgba(240,180,41,.18) 0%,transparent 70%); pointer-events:none; }
+    .course-hero-inner { display:grid; grid-template-columns:1fr 360px; gap:48px; max-width:1100px; margin:0 auto; }
+    .course-hero-text { padding-bottom:48px; }
+    .course-breadcrumb { display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.45); font-size:.82rem; margin-bottom:20px; }
+    .course-breadcrumb a { color:rgba(255,255,255,.55); transition:color var(--t-fast); }
+    .course-breadcrumb a:hover { color:var(--sb-gold); }
+    .course-breadcrumb span { color:rgba(255,255,255,.25); }
+    .course-hero-title { font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.6rem); color:var(--sb-white); margin:0 0 16px; line-height:1.2; }
+    .course-hero-desc  { color:rgba(255,255,255,.65); font-size:.95rem; line-height:1.7; margin:0 0 24px; }
+    .course-meta-row { display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin-bottom:20px; }
+    .meta-pill { display:flex; align-items:center; gap:6px; color:rgba(255,255,255,.7); font-size:.85rem; }
+    .meta-pill svg { opacity:.7; }
+    .course-rating-stars { color:var(--sb-gold); font-size:.9rem; }
+    .course-instructor { color:rgba(255,255,255,.6); font-size:.88rem; }
+    .course-instructor span { color:var(--sb-gold-light); }
+    .course-streams { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+    .stream-chip { background:rgba(107,53,196,.35); border:1px solid rgba(139,92,246,.4); color:var(--sb-purple-glow); padding:4px 12px; border-radius:var(--r-pill); font-size:.78rem; font-weight:600; }
+
+    /* Sticky purchase card */
+    .purchase-card {
+      background:var(--sb-white); border-radius:var(--r-lg); padding:0;
+      box-shadow:var(--shadow-lg); position:sticky; top:100px;
+      align-self:start; overflow:hidden; border:1px solid var(--sb-border);
+    }
+    .purchase-card-visual {
+      height:180px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:4rem; position:relative;
+    }
+    .purchase-card-body { padding:24px; }
+    .purchase-price { font-family:var(--font-display); font-size:2rem; color:var(--sb-purple-base); font-weight:800; margin:0 0 18px; }
+    .purchase-price .price-free { color:var(--sb-success); }
+    .purchase-btns { display:flex; flex-direction:column; gap:10px; }
+    .purchase-note { text-align:center; color:var(--sb-text-light); font-size:.78rem; margin-top:12px; }
+
+    /* Content tabs */
+    .course-content-area { max-width:1100px; margin:0 auto; padding:40px 48px; display:grid; grid-template-columns:1fr 360px; gap:40px; }
+    .course-tabs { display:flex; gap:0; border-bottom:2px solid var(--sb-border); margin-bottom:28px; }
+    .tab-btn { padding:12px 22px; background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; font-family:var(--font-body); font-size:.9rem; font-weight:600; color:var(--sb-text-light); cursor:pointer; transition:all var(--t-fast); }
+    .tab-btn.active { color:var(--sb-purple-base); border-bottom-color:var(--sb-purple-base); }
+    .tab-btn:hover:not(.active) { color:var(--sb-text-mid); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* Prerequisites */
+    .prereq-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .prereq-list li { display:flex; align-items:center; gap:10px; color:var(--sb-text-mid); font-size:.9rem; }
+    .prereq-list li::before { content:'✓'; color:var(--sb-success); font-weight:700; flex-shrink:0; }
+
+    /* Module accordion */
+    .module-list { display:flex; flex-direction:column; gap:10px; }
+    .module-item { border:1px solid var(--sb-border); border-radius:var(--r-md); overflow:hidden; }
+    .module-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--sb-surface); cursor:pointer; transition:background var(--t-fast); }
+    .module-header:hover { background:var(--sb-purple-pale); }
+    .module-header-left { display:flex; align-items:center; gap:12px; }
+    .module-num { width:28px; height:28px; background:linear-gradient(135deg,var(--sb-purple-light),var(--sb-purple-base)); color:var(--sb-white); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; flex-shrink:0; }
+    .module-name { font-weight:600; font-size:.9rem; color:var(--sb-text-dark); }
+    .module-toggle { color:var(--sb-text-light); transition:transform var(--t-fast); }
+    .module-item.open .module-toggle { transform:rotate(180deg); }
+    .module-body { display:none; padding:14px 18px; border-top:1px solid var(--sb-border); background:var(--sb-white); }
+    .module-item.open .module-body { display:block; }
+    .module-link { display:flex; align-items:center; gap:8px; color:var(--sb-purple-base); font-size:.88rem; transition:color var(--t-fast); }
+    .module-link:hover { color:var(--sb-purple-light); }
+
+    /* Reviews section */
+    .review-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-md); padding:18px; }
+    .review-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .reviewer-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--sb-purple-light),var(--sb-purple-base)); display:flex; align-items:center; justify-content:center; color:var(--sb-white); font-weight:700; font-size:.9rem; flex-shrink:0; }
+    .reviewer-name { font-weight:600; font-size:.9rem; color:var(--sb-text-dark); }
+    .review-stars { color:var(--sb-gold); font-size:.82rem; }
+    .review-text { color:var(--sb-text-mid); font-size:.88rem; line-height:1.6; margin:0; }
+
+    @media(max-width:900px) {
+      .course-hero-inner,.course-content-area { grid-template-columns:1fr; }
+      .purchase-card { position:static; }
+      .course-hero,.course-content-area { padding-left:20px; padding-right:20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="user-index.html" class="brand">
+      <div class="brand-icon">S</div>
+      <span class="brand-name">Skill<span>Builders</span></span>
+    </a>
+    <div class="sb-search">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search courses…" id="globalSearch" autocomplete="off">
+    </div>
+    <nav class="sb-nav">
+      <a href="user-enrolled-courses.html" class="hide-mobile">My Courses</a>
+      <a href="user-cart-courses.html" class="icon-btn" title="Cart"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></a>
+      <a href="user-favourite-courses.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></a>
+      <a href="user-page.html" class="icon-btn"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <div class="course-hero sb-animate" id="courseHero">
+    <div class="course-hero-inner">
+      <div class="course-hero-text">
+        <div class="course-breadcrumb">
+          <a href="user-index.html">Home</a><span>/</span>
+          <a href="search-courses.html">Courses</a><span>/</span>
+          <span id="breadcrumbStream">Loading…</span>
+        </div>
+        <!-- Skeleton while loading -->
+        <div id="heroSkeleton">
+          <div class="sb-skeleton" style="height:42px;width:80%;margin-bottom:16px"></div>
+          <div class="sb-skeleton" style="height:16px;width:100%;margin-bottom:8px"></div>
+          <div class="sb-skeleton" style="height:16px;width:70%;margin-bottom:24px"></div>
+          <div class="sb-skeleton" style="height:14px;width:50%"></div>
+        </div>
+        <div id="heroContent" style="display:none">
+          <h1 class="course-hero-title" id="courseTitle"></h1>
+          <p class="course-hero-desc" id="courseDesc"></p>
+          <div class="course-meta-row">
+            <div class="meta-pill"><span class="course-rating-stars" id="courseStars">★★★★★</span> <span id="courseRating"></span> (<span id="courseRatingCount"></span> ratings)</div>
+            <div class="meta-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span id="courseEnrolled"></span> students</div>
+            <div class="meta-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="courseDuration"></span> hours</div>
+            <div class="meta-pill"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg><span id="courseModules"></span> modules</div>
+          </div>
+          <p class="course-instructor">Instructor: <span id="courseInstructor"></span></p>
+          <div class="course-streams" id="courseStreams"></div>
+        </div>
+      </div>
+
+      <!-- Purchase Card -->
+      <div class="purchase-card sb-animate sb-animate-d1">
+        <div class="purchase-card-visual sb-gradient-card sb-gc-purple" style="border-radius:0" id="cardVisual">
+          <div style="font-size:4rem;position:relative;z-index:1" id="cardIcon">📚</div>
+        </div>
+        <div class="purchase-card-body">
+          <div class="purchase-price" id="cardPrice"><div class="sb-skeleton" style="height:36px;width:120px"></div></div>
+          <div class="purchase-btns">
+            <button class="sb-btn sb-btn-gold" style="width:100%;padding:14px" id="enrollBtn">Enroll Now</button>
+            <button class="sb-btn sb-btn-outline" style="width:100%;padding:13px" id="cartBtn">Add to Cart</button>
+            <button class="sb-btn" style="width:100%;padding:13px;background:var(--sb-purple-pale);color:var(--sb-purple-base)" id="favBtn">♡ Save to Favourites</button>
+          </div>
+          <p class="purchase-note">30-day money-back guarantee</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="course-content-area">
+    <div>
+      <div class="course-tabs">
+        <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab('modules')">Modules</button>
+        <button class="tab-btn" onclick="switchTab('reviews')">Reviews</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-overview">
+        <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 16px">Prerequisites</h3>
+        <ul class="prereq-list" id="prereqList">
+          <li class="sb-skeleton" style="height:20px;width:60%"></li>
+          <li class="sb-skeleton" style="height:20px;width:50%"></li>
+        </ul>
+      </div>
+
+      <div class="tab-panel" id="tab-modules">
+        <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 16px">Course Curriculum</h3>
+        <div class="module-list" id="moduleList">
+          <div class="sb-skeleton" style="height:56px;border-radius:12px;margin-bottom:10px"></div>
+          <div class="sb-skeleton" style="height:56px;border-radius:12px;margin-bottom:10px"></div>
+          <div class="sb-skeleton" style="height:56px;border-radius:12px"></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-reviews">
+        <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 16px">Student Reviews</h3>
+        <div style="display:flex;flex-direction:column;gap:14px" id="reviewsList">
+          <div class="sb-skeleton" style="height:90px;border-radius:12px"></div>
+        </div>
+        <div style="margin-top:24px">
+          <a href="user-review.html" class="sb-btn sb-btn-outline">Write a Review</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar info -->
+    <div style="display:flex;flex-direction:column;gap:16px;align-self:start">
+      <div style="background:var(--sb-white);border:1px solid var(--sb-border);border-radius:var(--r-lg);padding:22px">
+        <h4 style="font-family:var(--font-display);font-size:1rem;margin:0 0 14px;color:var(--sb-text-dark)">This course includes</h4>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--sb-text-mid)">📹 Video lectures per module</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--sb-text-mid)">📝 Module quizzes</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--sb-text-mid)">🏆 Certificate of completion</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--sb-text-mid)">♾️ Lifetime access</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="sb-footer">
+    <div class="sb-footer-inner">
+      <div><div class="brand-name">Skill<span>Builders</span></div><p>Empowering learners worldwide.</p></div>
+    </div>
+    <div class="sb-footer-copy">Copyright &copy; 2024 SkillBuilders. All rights reserved.</div>
+  </footer>
+
+  <script src="sb-global.js"></script>
+  <script src="show-course-preview.js"></script>
+  <script>
+    const gradients = [
+      {cls:'sb-gc-purple',icon:'💻'},{cls:'sb-gc-indigo',icon:'🗄️'},
+      {cls:'sb-gc-teal',icon:'📊'},{cls:'sb-gc-violet',icon:'🤖'},
+      {cls:'sb-gc-rose',icon:'🔐'},{cls:'sb-gc-amber',icon:'☁️'},
+    ];
+
+    function switchTab(id) {
+      document.querySelectorAll('.tab-btn').forEach((b,i) => {
+        const panels = ['overview','modules','reviews'];
+        b.classList.toggle('active', panels[i] === id);
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-'+id));
+    }
+
+    // Hook into existing show-course-preview.js — after it renders, populate our UI
+    window.addEventListener('courseDataLoaded', e => {
+      const c = e.detail;
+      if (!c) return;
+      // Hero
+      document.getElementById('heroSkeleton').style.display = 'none';
+      document.getElementById('heroContent').style.display = 'block';
+      document.getElementById('courseTitle').textContent = c.name || '';
+      document.getElementById('courseDesc').textContent = c.description || '';
+      document.getElementById('courseRating').textContent = (c.rating||0).toFixed(1);
+      document.getElementById('courseRatingCount').textContent = c.ratingCount || c.rating_count || 0;
+      document.getElementById('courseEnrolled').textContent = c.enrolledCount || c.enrolled_count || 0;
+      document.getElementById('courseDuration').textContent = c.duration || 0;
+      document.getElementById('courseModules').textContent = c.moduleCount || c.module_count || 0;
+      document.getElementById('courseInstructor').textContent = c.instructorName || c.instructor_name || '—';
+      document.getElementById('breadcrumbStream').textContent = (c.streams && c.streams[0]) || 'Course';
+
+      // Stars
+      const rating = Math.round(c.rating || 0);
+      document.getElementById('courseStars').textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+      // Streams
+      const streamsEl = document.getElementById('courseStreams');
+      streamsEl.innerHTML = '';
+      (c.streams || []).forEach(s => {
+        const chip = document.createElement('span');
+        chip.className = 'stream-chip';
+        chip.textContent = s;
+        streamsEl.appendChild(chip);
+      });
+
+      // Card
+      const g = gradients[Math.abs((c.courseId||c.courseid||0)) % gradients.length];
+      const cardVisual = document.getElementById('cardVisual');
+      cardVisual.className = `purchase-card-visual sb-gradient-card ${g.cls}`;
+      cardVisual.style.cssText = 'border-radius:0;min-height:180px';
+      document.getElementById('cardIcon').textContent = g.icon;
+      const price = c.price || 0;
+      document.getElementById('cardPrice').innerHTML = price === 0
+        ? '<span class="price-free">FREE</span>'
+        : `₹${price.toFixed(2)}`;
+
+      // Prerequisites
+      const prereqList = document.getElementById('prereqList');
+      prereqList.innerHTML = '';
+      const prereqs = c.prerequisites || [];
+      if (prereqs.length === 0) {
+        prereqList.innerHTML = '<li>No prerequisites — anyone can start!</li>';
+      } else {
+        prereqs.forEach(p => { const li = document.createElement('li'); li.textContent = p; prereqList.appendChild(li); });
+      }
+
+      // Modules
+      const moduleList = document.getElementById('moduleList');
+      moduleList.innerHTML = '';
+      (c.lectures || []).forEach(l => {
+        const item = document.createElement('div');
+        item.className = 'module-item';
+        item.innerHTML = `
+          <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+            <div class="module-header-left">
+              <div class="module-num">${l.moduleNumber || l.module_number}</div>
+              <div class="module-name">${l.moduleName || l.module_name}</div>
+            </div>
+            <svg class="module-toggle" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="module-body">
+            ${l.link ? `<a class="module-link" href="${l.link}" target="_blank">▶ Watch Lecture</a>` : '<span style="color:var(--sb-text-light);font-size:.88rem">Lecture link coming soon.</span>'}
+          </div>`;
+        moduleList.appendChild(item);
+      });
+    });
+
+    document.getElementById('globalSearch').addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&e.target.value.trim()){sessionStorage.setItem('searchQuery',e.target.value.trim());window.location.href='search-courses.html';}
+    });
+  </script>
+</body>
+</html>

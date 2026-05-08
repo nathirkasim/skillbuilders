@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; max-width:1100px; margin:0 auto; padding:40px 32px; }
+    .dash-card {
+      background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg);
+      overflow:hidden; box-shadow:var(--shadow-sm); transition:all var(--t-mid); cursor:pointer;
+      display:flex; flex-direction:column;
+    }
+    .dash-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); }
+    .dash-card-visual { height:140px; display:flex; align-items:center; justify-content:center; position:relative; }
+    .dash-card-icon { font-size:3.2rem; position:relative; z-index:1; filter:drop-shadow(0 2px 8px rgba(0,0,0,.25)); }
+    .dash-card-body { padding:20px; flex:1; }
+    .dash-card-title { font-family:var(--font-display); font-size:1.1rem; color:var(--sb-text-dark); margin:0 0 6px; }
+    .dash-card-desc  { color:var(--sb-text-light); font-size:.85rem; margin:0; line-height:1.5; }
+    .dash-card-footer { padding:12px 20px; border-top:1px solid var(--sb-border); display:flex; align-items:center; justify-content:space-between; }
+    .dash-card-footer span { font-size:.8rem; color:var(--sb-text-light); }
+    .dash-card-arrow { color:var(--sb-purple-base); font-size:1.1rem; transition:transform var(--t-fast); }
+    .dash-card:hover .dash-card-arrow { transform:translateX(4px); }
+    .greeting-bar { background:linear-gradient(135deg,var(--sb-purple-dark) 0%,var(--sb-purple-mid) 100%); padding:32px 40px; border-bottom:2px solid var(--sb-gold); }
+    .greeting-bar h1 { font-family:var(--font-display); color:var(--sb-white); font-size:1.8rem; margin:0 0 4px; }
+    .greeting-bar h1 span { color:var(--sb-gold); }
+    .greeting-bar p { color:rgba(255,255,255,.55); margin:0; font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="user-index.html" class="brand">
+      <div class="brand-icon">S</div>
+      <span class="brand-name">Skill<span>Builders</span></span>
+    </a>
+    <div class="sb-search">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search courses…" id="globalSearch" autocomplete="off">
+    </div>
+    <nav class="sb-nav">
+      <a href="user-enrolled-courses.html" class="hide-mobile">My Courses</a>
+      <a href="instructor-login.html" class="hide-mobile">Teach</a>
+      <a href="about-us.html" class="hide-mobile">About</a>
+      <a href="user-cart-courses.html" class="icon-btn" title="Cart"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></a>
+      <a href="user-favourite-courses.html" class="icon-btn" title="Favourites"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></a>
+      <a href="user-page.html" class="icon-btn" title="Profile"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+    </nav>
+  </header>
+
+  <div class="greeting-bar sb-animate">
+    <h1>Welcome back, <span id="userName">Learner</span> 👋</h1>
+    <p>Pick up where you left off or explore something new today.</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <a href="user-profile.html" class="dash-card sb-animate sb-animate-d1" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-purple" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">👤</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">Profile Configuration</div>
+        <div class="dash-card-desc">Edit your personal info, bio, and account settings.</div>
+      </div>
+      <div class="dash-card-footer"><span>Manage account</span><span class="dash-card-arrow">→</span></div>
+    </a>
+    <a href="user-enrolled-courses.html" class="dash-card sb-animate sb-animate-d1" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-indigo" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">📚</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">Enrolled Courses</div>
+        <div class="dash-card-desc">Continue your in-progress courses and track your growth.</div>
+      </div>
+      <div class="dash-card-footer"><span id="enrolledCount">0 courses</span><span class="dash-card-arrow">→</span></div>
+    </a>
+    <a href="user-completed-courses.html" class="dash-card sb-animate sb-animate-d2" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-teal" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">🏆</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">Completed Courses</div>
+        <div class="dash-card-desc">View and download your earned certificates.</div>
+      </div>
+      <div class="dash-card-footer"><span id="completedCount">0 certificates</span><span class="dash-card-arrow">→</span></div>
+    </a>
+    <a href="user-favourite-courses.html" class="dash-card sb-animate sb-animate-d2" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-rose" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">❤️</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">Favourite Courses</div>
+        <div class="dash-card-desc">Courses you saved and liked for later.</div>
+      </div>
+      <div class="dash-card-footer"><span id="favCount">0 saved</span><span class="dash-card-arrow">→</span></div>
+    </a>
+    <a href="user-cart-courses.html" class="dash-card sb-animate sb-animate-d3" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-amber" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">🛒</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">My Cart</div>
+        <div class="dash-card-desc">Courses selected and ready for purchase.</div>
+      </div>
+      <div class="dash-card-footer"><span id="cartCount">0 items</span><span class="dash-card-arrow">→</span></div>
+    </a>
+    <a href="retrieve-transactions.html" class="dash-card sb-animate sb-animate-d3" style="text-decoration:none;color:inherit">
+      <div class="dash-card-visual sb-gradient-card sb-gc-slate" style="border-radius:0;min-height:140px">
+        <div class="dash-card-icon">💳</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="dash-card-title">Transactions</div>
+        <div class="dash-card-desc">Full history of your purchases and payments.</div>
+      </div>
+      <div class="dash-card-footer"><span>View history</span><span class="dash-card-arrow">→</span></div>
+    </a>
+  </div>
+
+  <footer class="sb-footer">
+    <div class="sb-footer-inner">
+      <div><div class="brand-name">Skill<span>Builders</span></div><p>Empowering learners worldwide.</p></div>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.5)"><p>📧 skillbuilders@gmail.com</p></div>
+    </div>
+    <div class="sb-footer-copy">Copyright &copy; 2024 SkillBuilders. All rights reserved.</div>
+  </footer>
+
+  <script src="sb-global.js"></script>
+  <script src="user-page.js"></script>
+  <script>
+    document.getElementById('globalSearch').addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&e.target.value.trim()){sessionStorage.setItem('searchQuery',e.target.value.trim());window.location.href='search-courses.html';}
+    });
+    // Populate counts from existing user-page.js logic if available
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('/fetchuserinformation', { method:'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.name) document.getElementById('userName').textContent = data.name.split(' ')[0];
+          if (data && data.enrolledCourses) document.getElementById('enrolledCount').textContent = data.enrolledCourses.length + ' courses';
+          if (data && data.certificates)    document.getElementById('completedCount').textContent = data.certificates.length + ' certificates';
+          if (data && data.favouriteCourses)document.getElementById('favCount').textContent = data.favouriteCourses.length + ' saved';
+          if (data && data.cartCourses)     document.getElementById('cartCount').textContent = data.cartCourses.length + ' items';
+        }).catch(() => {});
+    });
+  </script>
+</body>
+</html>

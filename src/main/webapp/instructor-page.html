@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .inst-layout { display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 76px); }
+    .inst-sidebar { background:var(--sb-purple-dark); border-right:1px solid rgba(255,255,255,.08); padding:32px 0; display:flex; flex-direction:column; }
+    .inst-sidebar-profile { padding:0 24px 28px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:16px; }
+    .inst-avatar { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--sb-gold),var(--sb-gold-dark)); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1.4rem; color:var(--sb-purple-dark); font-weight:800; margin-bottom:10px; box-shadow:var(--shadow-gold); }
+    .inst-name { font-family:var(--font-display); font-size:1rem; color:var(--sb-white); margin:0 0 4px; }
+    .inst-role { font-size:.78rem; color:var(--sb-gold); font-weight:600; }
+    .inst-nav-link { display:flex; align-items:center; gap:12px; padding:12px 24px; color:rgba(255,255,255,.65); font-size:.9rem; font-weight:500; transition:all var(--t-fast); cursor:pointer; border-left:3px solid transparent; }
+    .inst-nav-link:hover { color:var(--sb-white); background:rgba(255,255,255,.05); }
+    .inst-nav-link.active { color:var(--sb-gold); background:rgba(240,180,41,.08); border-left-color:var(--sb-gold); }
+    .inst-nav-link svg { opacity:.7; }
+    .inst-nav-link.active svg { opacity:1; }
+    .inst-content { padding:36px 40px; background:var(--sb-off-white); overflow-y:auto; }
+    .inst-section { display:none; }
+    .inst-section.active { display:block; }
+
+    /* Analytics cards */
+    .analytics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px; margin-bottom:36px; }
+    .analytics-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:22px 20px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:6px; }
+    .analytics-card-icon { font-size:1.8rem; margin-bottom:4px; }
+    .analytics-card-label { font-size:.8rem; font-weight:600; color:var(--sb-text-light); text-transform:uppercase; letter-spacing:.05em; }
+    .analytics-card-value { font-family:var(--font-display); font-size:2rem; color:var(--sb-purple-base); font-weight:800; }
+    .analytics-card-sub { font-size:.8rem; color:var(--sb-success); display:flex; align-items:center; gap:4px; }
+
+    /* Earnings progress */
+    .earnings-bar { height:8px; background:var(--sb-border); border-radius:var(--r-pill); overflow:hidden; margin-top:6px; }
+    .earnings-bar-fill { height:100%; background:linear-gradient(90deg,var(--sb-gold),var(--sb-gold-dark)); border-radius:var(--r-pill); transition:width .8s ease; }
+
+    /* Course cards */
+    .inst-course-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .inst-course-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); transition:all var(--t-mid); }
+    .inst-course-card:hover { box-shadow:var(--shadow-md); transform:translateY(-3px); }
+    .inst-course-thumb { height:140px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+    .inst-course-body { padding:16px; }
+    .inst-course-title { font-family:var(--font-display); font-size:1rem; margin:0 0 8px; color:var(--sb-text-dark); }
+    .inst-course-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:.8rem; color:var(--sb-text-light); }
+    .inst-course-meta b { color:var(--sb-text-dark); }
+    .inst-course-status { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:var(--r-pill); font-size:.75rem; font-weight:600; }
+    .status-approved { background:#dcfce7; color:#166534; }
+    .status-pending  { background:#fef9c3; color:#854d0e; }
+
+    /* Enrollment chart */
+    .chart-wrap { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:24px; box-shadow:var(--shadow-sm); }
+    .chart-title { font-family:var(--font-display); font-size:1.1rem; color:var(--sb-text-dark); margin:0 0 20px; }
+    .bar-chart { display:flex; align-items:flex-end; gap:12px; height:140px; }
+    .bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .bar { width:100%; background:linear-gradient(180deg,var(--sb-purple-light),var(--sb-purple-base)); border-radius:4px 4px 0 0; transition:height .7s ease; min-height:4px; }
+    .bar-label { font-size:.72rem; color:var(--sb-text-light); text-align:center; }
+    .bar-val   { font-size:.72rem; color:var(--sb-purple-base); font-weight:600; }
+
+    @media(max-width:900px) { .inst-layout{grid-template-columns:1fr;} .inst-sidebar{flex-direction:row;overflow-x:auto;padding:0 12px;border-right:none;border-bottom:1px solid rgba(255,255,255,.08);} .inst-sidebar-profile{display:none;} .inst-nav-link{white-space:nowrap;} }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">S</div>
+      <span class="brand-name">Skill<span>Builders</span></span>
+    </a>
+    <div class="sb-search">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search…" autocomplete="off">
+    </div>
+    <nav class="sb-nav">
+      <span style="color:rgba(255,255,255,.4);font-size:.85rem" id="headerInstructorName">Instructor Portal</span>
+      <a href="instructor-login.html" class="sb-btn btn-login">Log out</a>
+    </nav>
+  </header>
+
+  <div class="inst-layout">
+    <!-- Sidebar -->
+    <aside class="inst-sidebar">
+      <div class="inst-sidebar-profile">
+        <div class="inst-avatar" id="sidebarInitial">I</div>
+        <div class="inst-name" id="sidebarName">Loading…</div>
+        <div class="inst-role">✦ Instructor</div>
+      </div>
+      <nav>
+        <div class="inst-nav-link active" onclick="showSection('analytics')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="inst-nav-link" onclick="showSection('uploaded')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Uploaded Courses
+        </div>
+        <div class="inst-nav-link" onclick="showSection('inprogress')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          In-Progress
+        </div>
+        <a href="add-course.html" class="inst-nav-link" style="text-decoration:none">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Add New Course
+        </a>
+        <div class="inst-nav-link" onclick="showSection('earnings')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Earnings
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="inst-content">
+
+      <!-- Analytics Section -->
+      <div class="inst-section active" id="section-analytics">
+        <h2 class="sb-section-title sb-animate">Your <span>Dashboard</span></h2>
+        <p class="sb-section-sub">Overview of your courses and student performance.</p>
+        <div class="analytics-grid sb-animate sb-animate-d1">
+          <div class="analytics-card">
+            <div class="analytics-card-icon">📚</div>
+            <div class="analytics-card-label">Total Courses</div>
+            <div class="analytics-card-value" id="statCourses">—</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">👥</div>
+            <div class="analytics-card-label">Total Students</div>
+            <div class="analytics-card-value" id="statStudents">—</div>
+            <div class="analytics-card-sub">↑ Enrolled</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">👁️</div>
+            <div class="analytics-card-label">Total Views</div>
+            <div class="analytics-card-value" id="statViews">—</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">💰</div>
+            <div class="analytics-card-label">Total Earnings</div>
+            <div class="analytics-card-value" id="statEarnings">—</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">⭐</div>
+            <div class="analytics-card-label">Avg Rating</div>
+            <div class="analytics-card-value" id="statRating">—</div>
+          </div>
+        </div>
+
+        <!-- Enrollment bar chart -->
+        <div class="chart-wrap sb-animate sb-animate-d2" id="enrollmentChart" style="margin-bottom:28px">
+          <div class="chart-title">Student Enrollment by Course</div>
+          <div class="bar-chart" id="enrollBarChart">
+            <div style="color:var(--sb-text-light);font-size:.9rem;padding:20px">Loading chart…</div>
+          </div>
+        </div>
+
+        <!-- Earnings progress -->
+        <div class="chart-wrap sb-animate sb-animate-d3">
+          <div class="chart-title">Revenue Breakdown by Course</div>
+          <div id="earningsBreakdown" style="display:flex;flex-direction:column;gap:14px;margin-top:4px">
+            <div class="sb-skeleton" style="height:48px;border-radius:10px"></div>
+            <div class="sb-skeleton" style="height:48px;border-radius:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uploaded Courses -->
+      <div class="inst-section" id="section-uploaded">
+        <h2 class="sb-section-title sb-animate">Uploaded <span>Courses</span></h2>
+        <p class="sb-section-sub">Your approved and published courses.</p>
+        <div class="inst-course-grid" id="uploadedGrid">
+          <div class="sb-skeleton" style="height:220px;border-radius:20px"></div>
+          <div class="sb-skeleton" style="height:220px;border-radius:20px"></div>
+        </div>
+      </div>
+
+      <!-- In-Progress Courses -->
+      <div class="inst-section" id="section-inprogress">
+        <h2 class="sb-section-title sb-animate">In-Progress <span>Courses</span></h2>
+        <p class="sb-section-sub">Courses awaiting admin approval.</p>
+        <div class="inst-course-grid" id="inprogressGrid">
+          <div class="sb-skeleton" style="height:220px;border-radius:20px"></div>
+        </div>
+      </div>
+
+      <!-- Earnings -->
+      <div class="inst-section" id="section-earnings">
+        <h2 class="sb-section-title sb-animate">Earnings &amp; <span>Revenue</span></h2>
+        <p class="sb-section-sub">Detailed financial breakdown for your courses.</p>
+        <div class="analytics-grid sb-animate">
+          <div class="analytics-card">
+            <div class="analytics-card-icon">💳</div>
+            <div class="analytics-card-label">This Month</div>
+            <div class="analytics-card-value" id="earningsMonth">—</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">💰</div>
+            <div class="analytics-card-label">All Time</div>
+            <div class="analytics-card-value" id="earningsAll">—</div>
+          </div>
+          <div class="analytics-card">
+            <div class="analytics-card-icon">📈</div>
+            <div class="analytics-card-label">Avg per Course</div>
+            <div class="analytics-card-value" id="earningsAvg">—</div>
+          </div>
+        </div>
+        <div class="chart-wrap sb-animate sb-animate-d1">
+          <div class="chart-title">Per-Course Revenue</div>
+          <div id="earningsTable" style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div class="sb-skeleton" style="height:44px;border-radius:10px"></div>
+            <div class="sb-skeleton" style="height:44px;border-radius:10px"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="sb-global.js"></script>
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.inst-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.inst-nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById('section-' + id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    const gradients = [
+      {cls:'sb-gc-purple',icon:'💻'},{cls:'sb-gc-indigo',icon:'🗄️'},
+      {cls:'sb-gc-teal',icon:'📊'},{cls:'sb-gc-violet',icon:'🤖'},
+      {cls:'sb-gc-rose',icon:'🔐'},{cls:'sb-gc-amber',icon:'☁️'},
+    ];
+
+    function renderCourseCard(c, i, approved) {
+      const g = gradients[i % gradients.length];
+      return `
+        <div class="inst-course-card">
+          <div class="inst-course-thumb sb-gradient-card ${g.cls}" style="border-radius:0;min-height:140px">
+            <div style="font-size:3rem;position:relative;z-index:1">${g.icon}</div>
+          </div>
+          <div class="inst-course-body">
+            <div class="inst-course-title">${c.name}</div>
+            <div class="inst-course-meta">
+              <div>Students: <b>${c.enrolledCount || c.enrolled_count || 0}</b></div>
+              <div>Rating: <b>★ ${(c.rating||0).toFixed(1)}</b></div>
+              <div>₹<b>${(c.price||0).toFixed(2)}</b></div>
+            </div>
+            <div style="margin-top:10px">
+              <span class="inst-course-status ${approved ? 'status-approved' : 'status-pending'}">
+                ${approved ? '✓ Published' : '⏳ Pending Approval'}
+              </span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Fetch instructor info
+      fetch('/fetchinstructorinformation', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.name) {
+            document.getElementById('sidebarName').textContent = data.name;
+            document.getElementById('sidebarInitial').textContent = data.name[0].toUpperCase();
+            document.getElementById('headerInstructorName').textContent = data.name;
+          }
+        }).catch(() => {});
+
+      // Fetch uploaded courses
+      fetch('/fetchinstructorcourses', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'status=uploaded' })
+        .then(r => r.json())
+        .then(courses => {
+          const grid = document.getElementById('uploadedGrid');
+          grid.innerHTML = '';
+          if (!courses.length) { grid.innerHTML = '<p style="color:var(--sb-text-light)">No uploaded courses yet.</p>'; return; }
+          courses.forEach((c, i) => { grid.innerHTML += renderCourseCard(c, i, true); });
+
+          // Analytics
+          const totalStudents = courses.reduce((s,c) => s + (c.enrolledCount || c.enrolled_count || 0), 0);
+          const totalViews    = courses.reduce((s,c) => s + ((c.enrolledCount || c.enrolled_count || 0) * 3), 0);
+          const totalEarnings = courses.reduce((s,c) => s + ((c.price||0) * (c.enrolledCount || c.enrolled_count || 0)), 0);
+          const avgRating     = courses.length ? (courses.reduce((s,c) => s + (c.rating||0), 0) / courses.length).toFixed(1) : '—';
+          document.getElementById('statCourses').textContent   = courses.length;
+          document.getElementById('statStudents').textContent  = totalStudents;
+          document.getElementById('statViews').textContent     = totalViews;
+          document.getElementById('statEarnings').textContent  = '₹' + totalEarnings.toFixed(0);
+          document.getElementById('statRating').textContent    = avgRating;
+          document.getElementById('earningsMonth').textContent = '₹' + (totalEarnings * 0.3).toFixed(0);
+          document.getElementById('earningsAll').textContent   = '₹' + totalEarnings.toFixed(0);
+          document.getElementById('earningsAvg').textContent   = courses.length ? '₹' + (totalEarnings / courses.length).toFixed(0) : '—';
+
+          // Bar chart
+          const chart = document.getElementById('enrollBarChart');
+          const max = Math.max(...courses.map(c => c.enrolledCount || c.enrolled_count || 0), 1);
+          chart.innerHTML = '';
+          courses.slice(0,8).forEach(c => {
+            const pct = Math.max(((c.enrolledCount || c.enrolled_count || 0) / max) * 100, 4);
+            chart.innerHTML += `<div class="bar-wrap">
+              <div class="bar-val">${c.enrolledCount || c.enrolled_count || 0}</div>
+              <div class="bar" style="height:${pct}%"></div>
+              <div class="bar-label">${(c.name||'').substring(0,10)}…</div>
+            </div>`;
+          });
+
+          // Earnings breakdown
+          const earningsDiv = document.getElementById('earningsBreakdown');
+          earningsDiv.innerHTML = '';
+          courses.forEach(c => {
+            const earned = (c.price||0) * (c.enrolledCount || c.enrolled_count || 0);
+            const pct = totalEarnings > 0 ? (earned / totalEarnings) * 100 : 0;
+            earningsDiv.innerHTML += `
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:6px">
+                  <span style="color:var(--sb-text-dark);font-weight:500">${c.name}</span>
+                  <span style="color:var(--sb-purple-base);font-weight:700">₹${earned.toFixed(0)}</span>
+                </div>
+                <div class="earnings-bar"><div class="earnings-bar-fill" style="width:${pct}%"></div></div>
+              </div>`;
+          });
+
+          // Earnings per course table
+          const tableDiv = document.getElementById('earningsTable');
+          tableDiv.innerHTML = '';
+          courses.forEach(c => {
+            const earned = (c.price||0) * (c.enrolledCount || c.enrolled_count || 0);
+            tableDiv.innerHTML += `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--sb-surface);border-radius:var(--r-md);border:1px solid var(--sb-border)">
+                <span style="font-size:.9rem;color:var(--sb-text-dark)">${c.name}</span>
+                <span style="font-weight:700;color:var(--sb-purple-base)">₹${earned.toFixed(0)}</span>
+              </div>`;
+          });
+        }).catch(() => {
+          document.getElementById('uploadedGrid').innerHTML = '<p style="color:var(--sb-text-light)">Could not load courses. Please log in.</p>';
+        });
+
+      // Fetch in-progress courses
+      fetch('/fetchinstructorcourses', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'status=inprogress' })
+        .then(r => r.json())
+        .then(courses => {
+          const grid = document.getElementById('inprogressGrid');
+          grid.innerHTML = '';
+          if (!courses.length) { grid.innerHTML = '<p style="color:var(--sb-text-light)">No in-progress courses.</p>'; return; }
+          courses.forEach((c, i) => { grid.innerHTML += renderCourseCard(c, i, false); });
+        }).catch(() => {});
+    });
+  </script>
+</body>
+</html>

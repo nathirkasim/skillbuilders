@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    body { background: var(--sb-purple-darkest); display:flex; flex-direction:column; min-height:100vh; padding-top:0; }
+    .auth-layout { display:flex; min-height:100vh; }
+    .auth-visual {
+      flex:1; background:linear-gradient(145deg, var(--sb-purple-dark) 0%, var(--sb-purple-mid) 60%, var(--sb-purple-base) 100%);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px;
+      position:relative; overflow:hidden;
+    }
+    .auth-visual::before { content:''; position:absolute; top:-80px; left:-80px; width:380px; height:380px; background:radial-gradient(circle,rgba(240,180,41,.22) 0%,transparent 70%); pointer-events:none; }
+    .auth-visual::after  { content:''; position:absolute; bottom:-80px; right:-80px; width:300px; height:300px; background:radial-gradient(circle,rgba(107,53,196,.35) 0%,transparent 70%); pointer-events:none; }
+    .auth-visual-content { position:relative; z-index:1; text-align:center; max-width:380px; }
+    .auth-visual-icon { width:80px; height:80px; background:linear-gradient(135deg,var(--sb-gold),var(--sb-gold-dark)); border-radius:var(--r-lg); display:flex; align-items:center; justify-content:center; font-size:2.2rem; margin:0 auto 28px; box-shadow:var(--shadow-gold); }
+    .auth-visual-content h2 { font-family:var(--font-display); font-size:2rem; color:var(--sb-white); margin:0 0 14px; }
+    .auth-visual-content h2 span { color:var(--sb-gold); }
+    .auth-visual-content p { color:rgba(255,255,255,.6); line-height:1.65; font-size:.95rem; }
+    .auth-perks { margin-top:32px; display:flex; flex-direction:column; gap:12px; text-align:left; }
+    .auth-perk { display:flex; align-items:center; gap:12px; color:rgba(255,255,255,.75); font-size:.9rem; }
+    .auth-perk-dot { width:28px; height:28px; background:var(--sb-gold-muted); border:1px solid rgba(240,180,41,.4); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.85rem; }
+
+    .auth-form-panel {
+      width:460px; flex-shrink:0;
+      background:var(--sb-white);
+      display:flex; flex-direction:column; justify-content:center;
+      padding:56px 48px;
+    }
+    .auth-header-row { display:flex; align-items:center; gap:10px; margin-bottom:36px; }
+    .auth-header-row .brand-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--sb-gold),var(--sb-gold-dark)); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:1rem; color:var(--sb-purple-dark); font-weight:800; }
+    .auth-header-row .brand-name { font-family:var(--font-display); font-size:1.1rem; color:var(--sb-text-dark); }
+    .auth-header-row .brand-name span { color:var(--sb-purple-base); }
+    .auth-title { font-family:var(--font-display); font-size:1.75rem; color:var(--sb-text-dark); margin:0 0 6px; }
+    .auth-sub { color:var(--sb-text-light); font-size:.9rem; margin:0 0 32px; }
+    .sb-form-group { margin-bottom:20px; }
+    .sb-form-group label { display:block; font-size:.85rem; font-weight:600; color:var(--sb-text-mid); margin-bottom:7px; }
+    .sb-form-group .sb-input { box-sizing:border-box; }
+    .sb-message { padding:12px 16px; border-radius:var(--r-md); font-size:.88rem; margin-bottom:20px; display:none; }
+    .sb-message.error   { background:#fef2f2; border:1px solid #fecaca; color:var(--sb-error); display:block; }
+    .sb-message.success { background:#f0fdf4; border:1px solid #bbf7d0; color:var(--sb-success); display:block; }
+    .auth-links { text-align:center; margin-top:24px; display:flex; flex-direction:column; gap:10px; }
+    .auth-links a { color:var(--sb-purple-base); font-size:.88rem; transition:color var(--t-fast); }
+    .auth-links a:hover { color:var(--sb-purple-light); }
+    .auth-divider { border:none; border-top:1px solid var(--sb-border); margin:24px 0; }
+    @media(max-width:900px) { .auth-visual{display:none;} .auth-form-panel{width:100%;} }
+    @media(max-width:480px) { .auth-form-panel{padding:36px 24px;} }
+  </style>
+</head>
+<body style="padding-top:0">
+  <div class="auth-layout">
+    <div class="auth-visual sb-animate">
+      <div class="auth-visual-content">
+        <div class="auth-visual-icon">🎓</div>
+        <h2>Welcome Back to<br><span>SkillBuilders</span></h2>
+        <p>Continue your learning journey where you left off. Your progress is waiting for you.</p>
+        <div class="auth-perks">
+          <div class="auth-perk"><div class="auth-perk-dot">✓</div>Access all your enrolled courses</div>
+          <div class="auth-perk"><div class="auth-perk-dot">★</div>Track your learning progress</div>
+          <div class="auth-perk"><div class="auth-perk-dot">🏆</div>View earned certificates</div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-form-panel sb-animate sb-animate-d1">
+      <div class="auth-header-row">
+        <div class="brand-icon">S</div>
+        <span class="brand-name">Skill<span>Builders</span></span>
+      </div>
+      <h1 class="auth-title">Sign in</h1>
+      <p class="auth-sub">Enter your credentials to access your account.</p>
+      <div class="sb-message" id="formMessage"></div>
+      <form id="loginForm" novalidate>
+        <div class="sb-form-group">
+          <label for="email">Email address</label>
+          <input class="sb-input" type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="sb-form-group">
+          <label for="password">Password</label>
+          <input class="sb-input" type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="sb-btn sb-btn-primary" style="width:100%;margin-top:8px;padding:14px" id="submitBtn">Sign in</button>
+      </form>
+      <hr class="auth-divider">
+      <div class="auth-links">
+        <div>Don't have an account? <a href="user-signup.html">Create one free</a></div>
+        <div><a href="instructor-login.html">Sign in as Instructor →</a></div>
+        <div><a href="admin-login.html">Admin login</a></div>
+      </div>
+    </div>
+  </div>
+  <script src="sb-global.js"></script>
+  <script src="user-login.js"></script>
+</body>
+</html>

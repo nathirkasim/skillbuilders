@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — SkillBuilders</title>
+  <link rel="stylesheet" href="sb-global.css">
+  <style>
+    .admin-layout { display:grid; grid-template-columns:220px 1fr; min-height:calc(100vh - 76px); }
+    .admin-sidebar { background:var(--sb-purple-darkest); padding:28px 0; display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,.07); }
+    .admin-sidebar-logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:12px; }
+    .admin-sidebar-logo .brand-label { font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--sb-gold); font-weight:700; margin-bottom:4px; }
+    .admin-sidebar-logo .brand-title { font-family:var(--font-display); font-size:1rem; color:var(--sb-white); }
+    .admin-nav-item { display:flex; align-items:center; gap:10px; padding:11px 20px; color:rgba(255,255,255,.55); font-size:.88rem; font-weight:500; cursor:pointer; transition:all var(--t-fast); border-left:3px solid transparent; }
+    .admin-nav-item:hover { color:var(--sb-white); background:rgba(255,255,255,.04); }
+    .admin-nav-item.active { color:var(--sb-gold); background:rgba(240,180,41,.07); border-left-color:var(--sb-gold); }
+    .admin-content { padding:36px 40px; background:var(--sb-off-white); overflow-y:auto; }
+    .admin-section { display:none; }
+    .admin-section.active { display:block; }
+
+    /* Stat cards */
+    .admin-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:18px; margin-bottom:32px; }
+    .admin-stat-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-sm); }
+    .admin-stat-icon { font-size:1.6rem; margin-bottom:8px; }
+    .admin-stat-label { font-size:.78rem; font-weight:600; color:var(--sb-text-light); text-transform:uppercase; letter-spacing:.05em; }
+    .admin-stat-val { font-family:var(--font-display); font-size:1.9rem; color:var(--sb-purple-base); font-weight:800; margin-top:4px; }
+
+    /* Table */
+    .admin-table-wrap { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
+    .admin-table-header { padding:18px 22px; border-bottom:1px solid var(--sb-border); display:flex; justify-content:space-between; align-items:center; }
+    .admin-table-header h3 { font-family:var(--font-display); font-size:1.1rem; margin:0; color:var(--sb-text-dark); }
+    table.sb-table { width:100%; border-collapse:collapse; }
+    table.sb-table th { background:var(--sb-surface); padding:12px 18px; text-align:left; font-size:.78rem; font-weight:700; color:var(--sb-text-light); text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid var(--sb-border); }
+    table.sb-table td { padding:14px 18px; font-size:.88rem; color:var(--sb-text-dark); border-bottom:1px solid var(--sb-border); vertical-align:middle; }
+    table.sb-table tr:last-child td { border-bottom:none; }
+    table.sb-table tr:hover td { background:var(--sb-surface); }
+    .admin-action-btn { padding:5px 12px; border-radius:var(--r-sm); font-size:.78rem; font-weight:600; border:none; cursor:pointer; transition:all var(--t-fast); }
+    .btn-approve { background:#dcfce7; color:#166534; }
+    .btn-approve:hover { background:#bbf7d0; }
+    .btn-reject  { background:#fee2e2; color:#991b1b; }
+    .btn-reject:hover  { background:#fecaca; }
+
+    /* Course cards for pending */
+    .pending-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .pending-card { background:var(--sb-white); border:1px solid var(--sb-border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
+    .pending-thumb { height:140px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+    .pending-body  { padding:16px; }
+    .pending-name  { font-family:var(--font-display); font-size:.95rem; margin:0 0 8px; }
+    .pending-meta  { font-size:.82rem; color:var(--sb-text-light); margin-bottom:12px; }
+    .pending-actions { display:flex; gap:8px; }
+
+    @media(max-width:900px) { .admin-layout{grid-template-columns:1fr;} .admin-sidebar{flex-direction:row;overflow-x:auto;padding:0;border-right:none;border-bottom:1px solid rgba(255,255,255,.07);} .admin-sidebar-logo{display:none;} .admin-nav-item{white-space:nowrap;padding:14px 16px;} }
+  </style>
+</head>
+<body>
+  <header class="sb-header">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">S</div>
+      <span class="brand-name">Skill<span>Builders</span></span>
+    </a>
+    <nav class="sb-nav">
+      <span style="color:rgba(255,255,255,.5);font-size:.85rem">Admin Portal</span>
+      <a href="admin-login.html" class="sb-btn btn-login">Log out</a>
+    </nav>
+  </header>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-logo">
+        <div class="brand-label">Control Panel</div>
+        <div class="brand-title">SkillBuilders Admin</div>
+      </div>
+      <div class="admin-nav-item active" onclick="showAdminSection('overview')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="admin-nav-item" onclick="showAdminSection('pending')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Pending Courses
+      </div>
+      <div class="admin-nav-item" onclick="showAdminSection('instructors')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Instructors
+      </div>
+      <div class="admin-nav-item" onclick="showAdminSection('users')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Users
+      </div>
+    </aside>
+
+    <main class="admin-content">
+
+      <!-- Overview -->
+      <div class="admin-section active" id="section-overview">
+        <h2 class="sb-section-title sb-animate">Platform <span>Overview</span></h2>
+        <p class="sb-section-sub">Live snapshot of SkillBuilders activity.</p>
+        <div class="admin-stats sb-animate sb-animate-d1">
+          <div class="admin-stat-card"><div class="admin-stat-icon">📚</div><div class="admin-stat-label">Total Courses</div><div class="admin-stat-val" id="ov-courses">—</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">⏳</div><div class="admin-stat-label">Pending Approval</div><div class="admin-stat-val" id="ov-pending">—</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">👨‍🏫</div><div class="admin-stat-label">Instructors</div><div class="admin-stat-val" id="ov-instructors">—</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">👥</div><div class="admin-stat-label">Users</div><div class="admin-stat-val" id="ov-users">—</div></div>
+          <div class="admin-stat-card"><div class="admin-stat-icon">💰</div><div class="admin-stat-label">Platform Revenue</div><div class="admin-stat-val" id="ov-revenue">—</div></div>
+        </div>
+      </div>
+
+      <!-- Pending Courses -->
+      <div class="admin-section" id="section-pending">
+        <h2 class="sb-section-title sb-animate">Pending <span>Approval</span></h2>
+        <p class="sb-section-sub">Review and approve or reject submitted courses.</p>
+        <div class="pending-grid" id="pendingGrid">
+          <div class="sb-skeleton" style="height:240px;border-radius:20px"></div>
+          <div class="sb-skeleton" style="height:240px;border-radius:20px"></div>
+        </div>
+      </div>
+
+      <!-- Instructors -->
+      <div class="admin-section" id="section-instructors">
+        <h2 class="sb-section-title sb-animate">Registered <span>Instructors</span></h2>
+        <p class="sb-section-sub">All instructors on the platform.</p>
+        <div class="admin-table-wrap sb-animate sb-animate-d1">
+          <div class="admin-table-header"><h3>Instructors List</h3></div>
+          <table class="sb-table" id="instructorTable">
+            <thead><tr><th>Name</th><th>Email</th><th>Courses</th><th>Actions</th></tr></thead>
+            <tbody id="instructorTbody"><tr><td colspan="4"><div class="sb-skeleton" style="height:18px"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="admin-section" id="section-users">
+        <h2 class="sb-section-title sb-animate">Registered <span>Users</span></h2>
+        <p class="sb-section-sub">All students on the platform.</p>
+        <div class="admin-table-wrap sb-animate sb-animate-d1">
+          <div class="admin-table-header"><h3>Users List</h3></div>
+          <table class="sb-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Enrolled</th><th>Actions</th></tr></thead>
+            <tbody id="usersTbody"><tr><td colspan="4"><div class="sb-skeleton" style="height:18px"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="sb-global.js"></script>
+  <script src="admin-handle.js"></script>
+  <script>
+    function showAdminSection(id) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.admin-nav-item').forEach(l => l.classList.remove('active'));
+      document.getElementById('section-' + id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    const gradients = [
+      {cls:'sb-gc-purple',icon:'💻'},{cls:'sb-gc-indigo',icon:'🗄️'},
+      {cls:'sb-gc-teal',icon:'📊'},{cls:'sb-gc-violet',icon:'🤖'},
+      {cls:'sb-gc-rose',icon:'🔐'},{cls:'sb-gc-amber',icon:'☁️'},
+    ];
+
+    // Hook into admin-handle.js after data loads
+    window.addEventListener('adminDataLoaded', e => {
+      const d = e.detail || {};
+      if (d.pendingCourses !== undefined) {
+        document.getElementById('ov-pending').textContent = d.pendingCourses;
+        document.getElementById('ov-courses').textContent = (d.totalCourses || 0);
+        document.getElementById('ov-instructors').textContent = (d.totalInstructors || 0);
+        document.getElementById('ov-users').textContent = (d.totalUsers || 0);
+        const rev = (d.revenue || 0);
+        document.getElementById('ov-revenue').textContent = '₹' + (typeof rev === 'number' ? rev.toFixed(0) : rev);
+
+        // Render pending course cards
+        if (d.courses && d.courses.length) {
+          const grid = document.getElementById('pendingGrid');
+          grid.innerHTML = '';
+          d.courses.filter(c => c.approved === 'false').forEach((c, i) => {
+            const g = gradients[i % gradients.length];
+            grid.innerHTML += `
+              <div class="pending-card">
+                <div class="pending-thumb sb-gradient-card ${g.cls}" style="border-radius:0;min-height:140px">
+                  <div style="font-size:3rem;position:relative;z-index:1">${g.icon}</div>
+                </div>
+                <div class="pending-body">
+                  <div class="pending-name">${c.name}</div>
+                  <div class="pending-meta">Instructor ID: ${c.instructorid} · ₹${(c.price||0).toFixed(2)} · ${c.duration||0}h</div>
+                  <div class="pending-actions">
+                    <button class="admin-action-btn btn-approve" onclick="approveCourse(${c.courseid})">✓ Approve</button>
+                    <button class="admin-action-btn btn-reject"  onclick="rejectCourse(${c.courseid})">✕ Reject</button>
+                  </div>
+                </div>
+              </div>`;
+          });
+        }
+      }
+    });
+
+    function approveCourse(id) {
+      fetch('/approvecourse', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`courseid=${id}` })
+        .then(r => r.json())
+        .then(d => { sbToast(d.message || 'Course approved!', 'success'); setTimeout(() => location.reload(), 1500); })
+        .catch(() => sbToast('Action failed', 'error'));
+    }
+    function rejectCourse(id) {
+      fetch('/rejectcourse', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`courseid=${id}` })
+        .then(r => r.json())
+        .then(d => { sbToast(d.message || 'Course rejected.', 'info'); setTimeout(() => location.reload(), 1500); })
+        .catch(() => sbToast('Action failed', 'error'));
+    }
+  </script>
+</body>
+</html>
